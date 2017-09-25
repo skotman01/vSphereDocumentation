@@ -1,6 +1,0 @@
-2017-09-25T10:00:36.6923088-05:00 Script log information can be found at C:\Users\Scott\Documents\GitHub\vSphereDocumentation\VirtualPlatformLogs\2017-09-25T10.00.36.5809980-05.00-ClusterDocument.log
-2017-09-25T10:00:36.7224737-05:00 Initialize PowerCLI Environment
-2017-09-25T10:00:36.8509952-05:00 Set Session Timeout to -1
-2017-09-25T10:00:36.9612726-05:00 Success
-2017-09-25T10:00:36.9783455-05:00 Not running script with elevated permissions, leaving PowerCLI Config as-is
-2017-09-25T10:00:36.9857077-05:00 Script start time 09/25/2017 10:00:36
