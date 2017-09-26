@@ -48,7 +48,7 @@ Function Write-Log{
 		[string]$BGColor="Black"
 		)
 	$LogData = ((Get-Date -Format o) + " " + $LogData)
-	add-content $Powerclilogfile $LogData
+#	add-content $Powerclilogfile $LogData
 	write-host $LogData -foregroundcolor $FGColor -backgroundcolor $BGColor
 }
 Function Select-Folder {
@@ -65,219 +65,316 @@ Function Select-Folder {
 
 function Connect-VCenters {
 
-#region Import the Assemblies
-[reflection.assembly]::loadwithpartialname("System.Windows.Forms") | Out-Null
-[reflection.assembly]::loadwithpartialname("System.Drawing") | Out-Null
-#endregion
+    #region Import the Assemblies
+    [reflection.assembly]::loadwithpartialname("System.Windows.Forms") | Out-Null
+    [reflection.assembly]::loadwithpartialname("System.Drawing") | Out-Null
+    #endregion
 
-#region Generated Form Objects
-$form1 = New-Object System.Windows.Forms.Form
-$checkBox1 = New-Object System.Windows.Forms.CheckBox
-$button1 = New-Object System.Windows.Forms.Button
-$label2 = New-Object System.Windows.Forms.Label
-$txtVcenters = New-Object System.Windows.Forms.TextBox
-$label1 = New-Object System.Windows.Forms.Label
-$panel1 = New-Object System.Windows.Forms.FlowLayoutPanel
-$InitialFormWindowState = New-Object System.Windows.Forms.FormWindowState
+    #region Generated Form Objects
+    $form1 = New-Object System.Windows.Forms.Form
+    $checkBox1 = New-Object System.Windows.Forms.CheckBox
+    $button1 = New-Object System.Windows.Forms.Button
+    $label2 = New-Object System.Windows.Forms.Label
+    $txtVcenters = New-Object System.Windows.Forms.TextBox
+    $label1 = New-Object System.Windows.Forms.Label
+    $panel1 = New-Object System.Windows.Forms.FlowLayoutPanel
+    $InitialFormWindowState = New-Object System.Windows.Forms.FormWindowState
 
-#endregion Generated Form Objects
+    #endregion Generated Form Objects
 
-#----------------------------------------------
-#Generated Event Script Blocks
-#----------------------------------------------
-#Provide Custom Code for events specified in PrimalForms.
-$button1_OnClick= 
-{
-#TODO: Place custom script here
+    #----------------------------------------------
+    #Generated Event Script Blocks
+    #----------------------------------------------
+    #Provide Custom Code for events specified in PrimalForms.
+    $button1_OnClick= 
+    {
+    #TODO: Place custom script here
 
 
-$vCenterConnectList = $txtVcenters.Text.Split(";")
-    ForEach ($vCenterConnect in $vCenterConnectList){
-        If (!($checkBox1.Checked)){
-            Try{
-                Connect-VIServer -Server $vCenterConnect -Credential $creds -ErrorAction Stop
-            }
-            catch{
-                $creds = Get-Credential -Message "Please enter credentials to connect to $vCenterConnect"
-                Connect-VIServer -Server $vCenterConnect -Credential $creds -ErrorAction Stop
-            }
+    $vCenterConnectList = $txtVcenters.Text.Split(";")
+        ForEach ($vCenterConnect in $vCenterConnectList){
+            If (!($checkBox1.Checked)){
+                Try{
+                    Connect-VIServer -Server $vCenterConnect -Credential $creds -ErrorAction Stop
+                }
+                catch{
+                    $creds = Get-Credential -Message "Please enter credentials to connect to $vCenterConnect"
+                    Connect-VIServer -Server $vCenterConnect -Credential $creds -ErrorAction Stop
+                }
             
-        }
-        Else{
-            Try{
-                $creds = Get-Credential -Message "Please enter credentials to connect to $($txtVcenters.Text)"
-                Connect-VIServer -Server $vCenterConnect -Credential $creds -ErrorAction Stop
             }
-            Catch{
-                [System.Windows.Forms.MessageBox]::Show("Bad Credentials, Please try again", "Error!",[System.Windows.Forms.MessageBoxButtons]::Ok,[System.Windows.Forms.MessageBoxIcon]::Error)
+            Else{
+                Try{
+                    $creds = Get-Credential -Message "Please enter credentials to connect to $($txtVcenters.Text)"
+                    Connect-VIServer -Server $vCenterConnect -Credential $creds -ErrorAction Stop
+                }
+                Catch{
+                    [System.Windows.Forms.MessageBox]::Show("Bad Credentials, Please try again", "Error!",[System.Windows.Forms.MessageBoxButtons]::Ok,[System.Windows.Forms.MessageBoxIcon]::Error)
                 
-            }
+                }
                     
+            }
+        }
+    If ($global:DefaultVIServers){
+        $NovcenterLabel = $null
+        $vcenterLabel = $null
+        forEach ($vCenter in $global:DefaultVIServers){
+            $vcenterLabel = New-Object System.Windows.Forms.Label
+            $vcenterLabel.Text = $vCenter
+            $vcenterLabel.AutoSize = $true
+            $vcenterLabel.Font = "Microsoft Sans Serif,8"
+            $panel1.controls.Add($vcenterLabel)
         }
     }
-If ($global:DefaultVIServers){
-    $NovcenterLabel = $null
-    $vcenterLabel = $null
-    forEach ($vCenter in $global:DefaultVIServers){
-        $vcenterLabel = New-Object System.Windows.Forms.Label
-        $vcenterLabel.Text = $vCenter
-        $vcenterLabel.AutoSize = $true
-        $vcenterLabel.Font = "Microsoft Sans Serif,8"
-        $panel1.controls.Add($vcenterLabel)
+
+
     }
-}
 
 
-}
-
-
-$OnLoadForm_StateCorrection=
-{#Correct the initial state of the form to prevent the .Net maximized form issue
-	$form1.WindowState = $InitialFormWindowState
-}
-
-#----------------------------------------------
-#region Generated Form Code
-$System_Drawing_Size = New-Object System.Drawing.Size
-$System_Drawing_Size.Height = 400
-$System_Drawing_Size.Width = 678
-$form1.ClientSize = $System_Drawing_Size
-$form1.DataBindings.DefaultDataSourceUpdateMode = 0
-$form1.Name = "form1"
-$form1.Text = "Primal Form"
-
-
-$checkBox1.DataBindings.DefaultDataSourceUpdateMode = 0
-
-$System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 21
-$System_Drawing_Point.Y = 269
-$checkBox1.Location = $System_Drawing_Point
-$checkBox1.Name = "checkBox1"
-$System_Drawing_Size = New-Object System.Drawing.Size
-$System_Drawing_Size.Height = 30
-$System_Drawing_Size.Width = 350
-$checkBox1.Size = $System_Drawing_Size
-$checkBox1.TabIndex = 5
-$checkBox1.Text = "Use same credentials for all vcenters above"
-$checkBox1.UseVisualStyleBackColor = $True
-
-$form1.Controls.Add($checkBox1)
-
-
-$button1.DataBindings.DefaultDataSourceUpdateMode = 0
-
-$System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 21
-$System_Drawing_Point.Y = 310
-$button1.Location = $System_Drawing_Point
-$button1.Name = "button1"
-$System_Drawing_Size = New-Object System.Drawing.Size
-$System_Drawing_Size.Height = 23
-$System_Drawing_Size.Width = 100
-$button1.Size = $System_Drawing_Size
-$button1.TabIndex = 4
-$button1.Text = "Connect"
-$button1.UseVisualStyleBackColor = $True
-$button1.add_Click($button1_OnClick)
-
-$form1.Controls.Add($button1)
-
-$label2.DataBindings.DefaultDataSourceUpdateMode = 0
-$label2.Font = New-Object System.Drawing.Font("Microsoft Sans Serif",10,1,3,0)
-
-$System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 418
-$System_Drawing_Point.Y = 13
-$label2.Location = $System_Drawing_Point
-$label2.Name = "label2"
-$System_Drawing_Size = New-Object System.Drawing.Size
-$System_Drawing_Size.Height = 23
-$System_Drawing_Size.Width = 248
-$label2.Size = $System_Drawing_Size
-$label2.TabIndex = 3
-$label2.Text = "Existing vCenter Connections"
-
-$form1.Controls.Add($label2)
-
-$txtVcenters.DataBindings.DefaultDataSourceUpdateMode = 0
-$System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 21
-$System_Drawing_Point.Y = 82
-$txtVcenters.Location = $System_Drawing_Point
-$txtVcenters.Multiline = $True
-$txtVcenters.Name = "txtVcenters"
-$System_Drawing_Size = New-Object System.Drawing.Size
-$System_Drawing_Size.Height = 171
-$System_Drawing_Size.Width = 372
-$txtVcenters.Size = $System_Drawing_Size
-$txtVcenters.TabIndex = 2
-
-$form1.Controls.Add($txtVcenters)
-
-$label1.DataBindings.DefaultDataSourceUpdateMode = 0
-$label1.Font = New-Object System.Drawing.Font("Microsoft Sans Serif",10,1,3,0)
-
-$System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 21
-$System_Drawing_Point.Y = 12
-$label1.Location = $System_Drawing_Point
-$label1.Name = "label1"
-$System_Drawing_Size = New-Object System.Drawing.Size
-$System_Drawing_Size.Height = 57
-$System_Drawing_Size.Width = 372
-$label1.Size = $System_Drawing_Size
-$label1.TabIndex = 1
-$label1.Text = "Please enter vCenter(s) to connect to, seperate multiple vCenters with semicolon"
-$label1.add_Click($handler_label1_Click)
-
-$form1.Controls.Add($label1)
-
-$panel1.AutoScroll = $True
-$panel1.FlowDirection = "TopDown"
-
-$panel1.BorderStyle = 2
-$panel1.DataBindings.DefaultDataSourceUpdateMode = 0
-$System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 418
-$System_Drawing_Point.Y = 48
-$panel1.Location = $System_Drawing_Point
-$panel1.Name = "panel1"
-$System_Drawing_Size = New-Object System.Drawing.Size
-$System_Drawing_Size.Height = 261
-$System_Drawing_Size.Width = 257
-$panel1.Size = $System_Drawing_Size
-$panel1.TabIndex = 0
-
-$form1.Controls.Add($panel1)
-If ($global:DefaultVIServers){
-    forEach ($vCenter in $global:DefaultVIServers){
-        $vcenterLabel = New-Object System.Windows.Forms.Label
-        $vcenterLabel.Text = $vCenter
-        $vcenterLabel.AutoSize = $true
-        $vcenterLabel.Font = "Microsoft Sans Serif,8"
-        $panel1.controls.Add($vcenterLabel)
+    $OnLoadForm_StateCorrection=
+    {#Correct the initial state of the form to prevent the .Net maximized form issue
+	    $form1.WindowState = $InitialFormWindowState
     }
-}
-Else{
-    $NovcenterLabel = New-Object System.Windows.Forms.Label
-    $NovcenterLabel.Text = "No vCenters Currently Connected"
-    $NovcenterLabel.AutoSize = $true
-    $NovcenterLabel.Font = "Microsoft Sans Serif,8"
-    $panel1.controls.Add($NovcenterLabel)
-}
 
-#endregion Generated Form Code
+    #----------------------------------------------
+    #region Generated Form Code
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 400
+    $System_Drawing_Size.Width = 678
+    $form1.ClientSize = $System_Drawing_Size
+    $form1.DataBindings.DefaultDataSourceUpdateMode = 0
+    $form1.Name = "form1"
+    $form1.Text = "Primal Form"
 
-#Save the initial state of the form
-$InitialFormWindowState = $form1.WindowState
-#Init the OnLoad event to correct the initial state of the form
-$form1.add_Load($OnLoadForm_StateCorrection)
-#Show the Form
-$form1.ShowDialog()| Out-Null
+
+    $checkBox1.DataBindings.DefaultDataSourceUpdateMode = 0
+
+    $System_Drawing_Point = New-Object System.Drawing.Point
+    $System_Drawing_Point.X = 21
+    $System_Drawing_Point.Y = 269
+    $checkBox1.Location = $System_Drawing_Point
+    $checkBox1.Name = "checkBox1"
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 30
+    $System_Drawing_Size.Width = 350
+    $checkBox1.Size = $System_Drawing_Size
+    $checkBox1.TabIndex = 5
+    $checkBox1.Text = "Use same credentials for all vcenters above"
+    $checkBox1.UseVisualStyleBackColor = $True
+
+    $form1.Controls.Add($checkBox1)
+
+
+    $button1.DataBindings.DefaultDataSourceUpdateMode = 0
+
+    $System_Drawing_Point = New-Object System.Drawing.Point
+    $System_Drawing_Point.X = 21
+    $System_Drawing_Point.Y = 310
+    $button1.Location = $System_Drawing_Point
+    $button1.Name = "button1"
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 23
+    $System_Drawing_Size.Width = 100
+    $button1.Size = $System_Drawing_Size
+    $button1.TabIndex = 4
+    $button1.Text = "Connect"
+    $button1.UseVisualStyleBackColor = $True
+    $button1.add_Click($button1_OnClick)
+
+    $form1.Controls.Add($button1)
+
+    $label2.DataBindings.DefaultDataSourceUpdateMode = 0
+    $label2.Font = New-Object System.Drawing.Font("Microsoft Sans Serif",10,1,3,0)
+
+    $System_Drawing_Point = New-Object System.Drawing.Point
+    $System_Drawing_Point.X = 418
+    $System_Drawing_Point.Y = 13
+    $label2.Location = $System_Drawing_Point
+    $label2.Name = "label2"
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 23
+    $System_Drawing_Size.Width = 248
+    $label2.Size = $System_Drawing_Size
+    $label2.TabIndex = 3
+    $label2.Text = "Existing vCenter Connections"
+
+    $form1.Controls.Add($label2)
+
+    $txtVcenters.DataBindings.DefaultDataSourceUpdateMode = 0
+    $System_Drawing_Point = New-Object System.Drawing.Point
+    $System_Drawing_Point.X = 21
+    $System_Drawing_Point.Y = 82
+    $txtVcenters.Location = $System_Drawing_Point
+    $txtVcenters.Multiline = $True
+    $txtVcenters.Name = "txtVcenters"
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 171
+    $System_Drawing_Size.Width = 372
+    $txtVcenters.Size = $System_Drawing_Size
+    $txtVcenters.TabIndex = 2
+
+    $form1.Controls.Add($txtVcenters)
+
+    $label1.DataBindings.DefaultDataSourceUpdateMode = 0
+    $label1.Font = New-Object System.Drawing.Font("Microsoft Sans Serif",10,1,3,0)
+
+    $System_Drawing_Point = New-Object System.Drawing.Point
+    $System_Drawing_Point.X = 21
+    $System_Drawing_Point.Y = 12
+    $label1.Location = $System_Drawing_Point
+    $label1.Name = "label1"
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 57
+    $System_Drawing_Size.Width = 372
+    $label1.Size = $System_Drawing_Size
+    $label1.TabIndex = 1
+    $label1.Text = "Please enter vCenter(s) to connect to, seperate multiple vCenters with semicolon"
+    $label1.add_Click($handler_label1_Click)
+
+    $form1.Controls.Add($label1)
+
+    $panel1.AutoScroll = $True
+    $panel1.FlowDirection = "TopDown"
+
+    $panel1.BorderStyle = 2
+    $panel1.DataBindings.DefaultDataSourceUpdateMode = 0
+    $System_Drawing_Point = New-Object System.Drawing.Point
+    $System_Drawing_Point.X = 418
+    $System_Drawing_Point.Y = 48
+    $panel1.Location = $System_Drawing_Point
+    $panel1.Name = "panel1"
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 261
+    $System_Drawing_Size.Width = 257
+    $panel1.Size = $System_Drawing_Size
+    $panel1.TabIndex = 0
+
+    $form1.Controls.Add($panel1)
+    If ($global:DefaultVIServers){
+        forEach ($vCenter in $global:DefaultVIServers){
+            $vcenterLabel = New-Object System.Windows.Forms.Label
+            $vcenterLabel.Text = $vCenter
+            $vcenterLabel.AutoSize = $true
+            $vcenterLabel.Font = "Microsoft Sans Serif,8"
+            $panel1.controls.Add($vcenterLabel)
+        }
+    }
+    Else{
+        $NovcenterLabel = New-Object System.Windows.Forms.Label
+        $NovcenterLabel.Text = "No vCenters Currently Connected"
+        $NovcenterLabel.AutoSize = $true
+        $NovcenterLabel.Font = "Microsoft Sans Serif,8"
+        $panel1.controls.Add($NovcenterLabel)
+    }
+
+    #endregion Generated Form Code
+
+    #Save the initial state of the form
+    $InitialFormWindowState = $form1.WindowState
+    #Init the OnLoad event to correct the initial state of the form
+    $form1.add_Load($OnLoadForm_StateCorrection)
+    #Show the Form
+    $form1.ShowDialog()| Out-Null
 
 
 } #End Function
+
+Function Get-Clusters{
+
+    #region Import the Assemblies
+    [reflection.assembly]::loadwithpartialname("System.Windows.Forms") | Out-Null
+    [reflection.assembly]::loadwithpartialname("System.Drawing") | Out-Null
+    #endregion
+
+    #region Generated Form Objects
+    $form1 = New-Object System.Windows.Forms.Form
+    $PanelClusters = New-Object System.Windows.Forms.FlowLayoutPanel
+    $InitialFormWindowState = New-Object System.Windows.Forms.FormWindowState
+    $btnDocument = New-Object System.Windows.Forms.Button
+    #endregion Generated Form Objects
+
+    #region Generated Form Code
+    $btnDocument_OnClick= 
+    {
+    #TODO: Place custom script here
+        [System.Collections.ArrayList]$ClusterList = @()
+        ForEach ($ClusterCheckBox in $ClusterCheckBoxes){
+            If ($ClusterCheckBox.Checked){
+                $ClusterList.Add($ClusterCheckBox.Name)    
+            }
+        }
+    $form1.Close()
+    }
+
+
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 371
+    $System_Drawing_Size.Width = 580
+    $form1.ClientSize = $System_Drawing_Size
+    $form1.DataBindings.DefaultDataSourceUpdateMode = 0
+    $form1.Name = "form1"
+    $form1.Text = "Primal Form"
+
+
+    $PanelClusters.DataBindings.DefaultDataSourceUpdateMode = 0
+    $System_Drawing_Point = New-Object System.Drawing.Point
+    $System_Drawing_Point.X = 13
+    $System_Drawing_Point.Y = 13
+    $PanelClusters.Location = $System_Drawing_Point
+    $PanelClusters.Name = "PanelClusters"
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 346
+    $System_Drawing_Size.Width = 555
+    $PanelClusters.Size = $System_Drawing_Size
+    $PanelClusters.TabIndex = 0
+    $PanelClusters.FlowDirection = "TopDown"
+
+
+    ForEach($vcenter in $global:DefaultVIServers){
+            $vCenterLabel = New-Object System.Windows.Forms.Label
+            $vCenterLabel.Text = $vcenter
+            $vCenterLabel.AutoSize = $true
+            $vCenterLabel.Font = New-Object System.Drawing.Font("Microsoft Sans Serif",8.25,1,3,0)
+            $PanelClusters.controls.Add($vCenterLabel)
+
+           $ClusterCheckBoxes = ForEach($cluster in (get-cluster -Server $vcenter)){
+                $checkBox1 = New-Object System.Windows.Forms.CheckBox
+                $checkBox1.Text = $cluster.Name
+                $checkBox1.Name = "$vcenter~$cluster"
+                $PanelClusters.controls.Add($checkBox1)
+                $checkBox1
+            }
+
+    }
+
+
+    $btnDocument.DataBindings.DefaultDataSourceUpdateMode = 0
+    $System_Drawing_Point.X = 12
+    $System_Drawing_Point.Y = 304
+    $btnDocument.Location = $System_Drawing_Point
+    $btnDocument.Name = "btnDocument"
+    $btnDocument.Name = "btnDocument"
+    $System_Drawing_Size.Height = 25
+    $System_Drawing_Size.Width = 80
+    $btnDocument.Size = $System_Drawing_Size
+    $btnDocument.TabIndex = 0
+    $btnDocument.Text = "Document"
+    $btnDocument.UseVisualStyleBackColor = $True
+    $btnDocument.add_Click($btnDocument_OnClick)
+    $form1.Controls.Add($btnDocument)
+    $form1.Controls.Add($PanelClusters)
+
+    #endregion Generated Form Code
+
+    #Save the initial state of the form
+    $InitialFormWindowState = $form1.WindowState
+    #Init the OnLoad event to correct the initial state of the form
+    $form1.add_Load($OnLoadForm_StateCorrection)
+    #Show the Form
+    $form1.ShowDialog()| Out-Null
+    Return $ClusterList
+} #End Function
+
 
 #Declare Forms
 [void] [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") 
@@ -364,9 +461,8 @@ Write-Log "Script start time $StartTime"
 Connect-VCenters
 
 $clusters = get-clusters
-while ($clusters[0] -is [Int32]) {
-            $clusters = $clusters[1..($clusters.Length - 1)]
-}
+
+
 
     $Word = New-Object -ComObject Word.Application
     $word.Visible = $True
@@ -389,6 +485,8 @@ Switch([System.Windows.Forms.MessageBox]::Show("Would you like 1 file per vCente
 }
 
 foreach ($cluster in $clusters){
+    $vc_vCenter = ($Cluster.Split("~"))[0]
+    $cluster = get-cluster -Server $vc_vCenter -Name ($Cluster.Split("~"))[1]
     If ($OneFile){
         $Output = $DestFolder + "\" + $vc_vCenter.SubString(0,$vc_vCenter.IndexOf("."))
         if ($FirstCluster){
@@ -397,7 +495,7 @@ foreach ($cluster in $clusters){
 
             #Begin adding content to Word Doc
             $Selection.Style = "Title"
-            $Selection.TypeText("Delta Airlines documentation for vSphere Cluster $Cluster")
+            $Selection.TypeText("Documentation for vSphere Cluster $Cluster")
             $selection.ParagraphFormat.Alignment = "wdAlignParagraphCenter"
             $Selection.TypeParagraph()        
             $FirstCluster = $False
@@ -410,7 +508,7 @@ foreach ($cluster in $clusters){
 
         #Begin adding content to Word Doc
         $Selection.Style = "Title"
-        $Selection.TypeText("Delta Airlines documentation for vSphere Cluster $Cluster")
+        $Selection.TypeText("Documentation for vSphere Cluster $Cluster")
         $selection.ParagraphFormat.Alignment = "wdAlignParagraphCenter"
         $Selection.TypeParagraph()
     }
@@ -421,7 +519,7 @@ foreach ($cluster in $clusters){
     $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
     $Selection.TypeParagraph()
 
-    $Selection.TypeText("$Cluster resides in Datacenter $($(get-cluster | get-datacenter).Name) and contains $($(get-cluster -name $cluster| get-vmhost).count) VMHosts and $($(get-cluster -name $cluster| get-vm).count) VMs")
+    $Selection.TypeText("$Cluster resides in Datacenter $($($cluster | get-datacenter).Name) and contains $($($cluster | get-vmhost).count) VMHosts and $($($cluster | get-vm).count) VMs")
     $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
     $Selection.TypeParagraph()
 
@@ -651,7 +749,7 @@ foreach ($vmhost in $vmhosts){
     $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
     $Selection.TypeParagraph()
 
-    $datastores = get-cluster -name $cluster | Get-Datastore
+    $datastores = $cluster | Get-Datastore
 
     $Range = @($Selection.Paragraphs)[-1].Range
     $Table = $Selection.Tables.add($Selection.Range,($datastores.Count+1),6,[Microsoft.Office.Interop.Word.wDDefaultTableBehavior]::wdWord9TableBehavior,[Microsoft.Office.Interop.Word.WdAutoFitBehavior]::wdAutoFitContent)
