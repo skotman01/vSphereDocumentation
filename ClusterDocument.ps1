@@ -74,6 +74,7 @@ function Connect-VCenters {
     $form1 = New-Object System.Windows.Forms.Form
     $checkBox1 = New-Object System.Windows.Forms.CheckBox
     $button1 = New-Object System.Windows.Forms.Button
+    $button2 = New-Object System.Windows.Forms.Button
     $label2 = New-Object System.Windows.Forms.Label
     $txtVcenters = New-Object System.Windows.Forms.TextBox
     $label1 = New-Object System.Windows.Forms.Label
@@ -130,6 +131,11 @@ function Connect-VCenters {
 
     }
 
+    $button2_OnClick= 
+    {
+    $form1.Close()
+    }
+
 
     $OnLoadForm_StateCorrection=
     {#Correct the initial state of the form to prevent the .Net maximized form issue
@@ -144,7 +150,7 @@ function Connect-VCenters {
     $form1.ClientSize = $System_Drawing_Size
     $form1.DataBindings.DefaultDataSourceUpdateMode = 0
     $form1.Name = "form1"
-    $form1.Text = "Primal Form"
+    $form1.Text = "Connect to vCenter(s)"
 
 
     $checkBox1.DataBindings.DefaultDataSourceUpdateMode = 0
@@ -181,7 +187,22 @@ function Connect-VCenters {
     $button1.UseVisualStyleBackColor = $True
     $button1.add_Click($button1_OnClick)
 
+    $System_Drawing_Point = New-Object System.Drawing.Point
+    $System_Drawing_Point.X = 200
+    $System_Drawing_Point.Y = 310
+    $button2.Location = $System_Drawing_Point
+    $button2.Name = "button2"
+    $System_Drawing_Size = New-Object System.Drawing.Size
+    $System_Drawing_Size.Height = 23
+    $System_Drawing_Size.Width = 100
+    $button2.Size = $System_Drawing_Size
+    $button2.TabIndex = 4
+    $button2.Text = "Continue"
+    $button2.UseVisualStyleBackColor = $True
+    $button2.add_Click($button2_OnClick)
+
     $form1.Controls.Add($button1)
+    $form1.Controls.Add($button2)
 
     $label2.DataBindings.DefaultDataSourceUpdateMode = 0
     $label2.Font = New-Object System.Drawing.Font("Microsoft Sans Serif",10,1,3,0)
@@ -488,7 +509,12 @@ foreach ($cluster in $clusters){
     $vc_vCenter = ($Cluster.Split("~"))[0]
     $cluster = get-cluster -Server $vc_vCenter -Name ($Cluster.Split("~"))[1]
     If ($OneFile){
-        $Output = $DestFolder + "\" + $vc_vCenter.SubString(0,$vc_vCenter.IndexOf("."))
+        If ($vcenter -notmatch "\b(?:\d{1,3}\.){3}\d{1,3}\b"){
+            $Output = $DestFolder + "\" + $vc_vCenter.SubString(0,$vc_vCenter.IndexOf("."))
+        }
+        Else{
+            $Output = $DestFolder + "\" + $vc_vCenter
+        }
         if ($FirstCluster){
             $Document = $Word.Documents.Add()
             $Selection = $Word.Selection
@@ -502,7 +528,12 @@ foreach ($cluster in $clusters){
         }
     }
     Else{
-        $Output = $DestFolder + "\" + $vc_vCenter.SubString(0,$vc_vCenter.IndexOf(".")) + "-" + $cluster
+        If ($vcenter -notmatch "\b(?:\d{1,3}\.){3}\d{1,3}\b"){
+            $Output = $DestFolder + "\" + $vc_vCenter.SubString(0,$vc_vCenter.IndexOf(".")) + "-" + $cluster
+        }
+        Else{
+            $Output = $DestFolder + "\" + $vc_vCenter + "-" + $cluster
+        }
         $Document = $Word.Documents.Add()
         $Selection = $Word.Selection
 
