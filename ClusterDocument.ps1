@@ -297,10 +297,10 @@ Function Get-Clusters{
     $btnDocument_OnClick= 
     {
     #TODO: Place custom script here
-        [System.Collections.ArrayList]$ClusterList = @()
+        [System.Collections.ArrayList]$Script:ClusterList = @()
         ForEach ($ClusterCheckBox in $ClusterCheckBoxes){
             If ($ClusterCheckBox.Checked){
-                $ClusterList.Add($ClusterCheckBox.Name)    
+                $Script:ClusterList.Add($ClusterCheckBox.Name)    
             }
         }
     $form1.Close()
@@ -372,7 +372,7 @@ Function Get-Clusters{
     $form1.add_Load($OnLoadForm_StateCorrection)
     #Show the Form
     $form1.ShowDialog()| Out-Null
-    Return $ClusterList
+    Return $Script:ClusterList
 } #End Function
 
 
@@ -496,7 +496,7 @@ foreach ($cluster in $clusters){
             #Begin adding content to Word Doc
             $Selection.Style = "Title"
             $Selection.TypeText("Documentation for vSphere Cluster $Cluster")
-            $selection.ParagraphFormat.Alignment = "wdAlignParagraphCenter"
+            $selection.ParagraphFormat.Alignment = 1
             $Selection.TypeParagraph()        
             $FirstCluster = $False
         }
@@ -509,25 +509,25 @@ foreach ($cluster in $clusters){
         #Begin adding content to Word Doc
         $Selection.Style = "Title"
         $Selection.TypeText("Documentation for vSphere Cluster $Cluster")
-        $selection.ParagraphFormat.Alignment = "wdAlignParagraphCenter"
+        $selection.ParagraphFormat.Alignment = 1
         $Selection.TypeParagraph()
     }
     
     
     $Selection.Style = "Heading 1"
     $Selection.TypeText("Information for $Cluster")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
     $Selection.TypeText("$Cluster resides in Datacenter $($($cluster | get-datacenter).Name) and contains $($($cluster | get-vmhost).count) VMHosts and $($($cluster | get-vm).count) VMs")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
 #Get VMHost info
 
     $Selection.Style = "Heading 2"
     $Selection.TypeText("Host Summary")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
     
     $vmhosts = get-vmhost -Location $cluster | sort
@@ -549,7 +549,7 @@ foreach ($cluster in $clusters){
         $Table.cell(($row+2),2).range.Bold = 0
         $Table.cell(($row+2),2).range.text = $(Get-VMHostNetworkAdapter -VMHost $vmhost -Name vmk0).IP
         $Table.cell(($row+2),3).range.Bold = 0
-        $Table.cell(($row+2),3).range.text = $vmhost.ConnectionState
+        $Table.cell(($row+2),3).range.text = "$($vmhost.ConnectionState)"
         $row++
     }
     $Word.Selection.Start= $Document.Content.End
@@ -558,7 +558,7 @@ foreach ($cluster in $clusters){
 #Detailed host information
     $Selection.Style = "Heading 2"
     $Selection.TypeText("Host Details")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
 foreach ($vmhost in $vmhosts){
@@ -566,12 +566,12 @@ foreach ($vmhost in $vmhosts){
     $vmhostInfo = Get-VMHostHardware -VMHost $vmhost
     $Selection.Style = "Heading 3"
     $Selection.TypeText($vmhost.name)
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
     $Selection.Style = "Heading 4"
     $Selection.TypeText("Hardware")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
         
     $Range = @($Selection.Paragraphs)[-1].Range
@@ -595,7 +595,7 @@ foreach ($vmhost in $vmhosts){
     $Table.cell(4,1).range.Bold=0
     $Table.cell(4,1).range.text = "Memory Total (GB)"
     $Table.cell(4,2).range.Bold=0
-    $Table.cell(4,2).range.text= $vmhost.MemoryTotalGB
+    $Table.cell(4,2).range.text= "$($vmhost.MemoryTotalGB)"
 
     $Table.cell(5,1).range.Bold=0
     $Table.cell(5,1).range.text = "Processor Type"
@@ -605,7 +605,7 @@ foreach ($vmhost in $vmhosts){
     $Table.cell(6,1).range.Bold=0
     $Table.cell(6,1).range.text = "Hyper threading Active"
     $Table.cell(6,2).range.Bold=0
-    $Table.cell(6,2).range.text= $vmhost.HyperthreadingActive
+    $Table.cell(6,2).range.text= "$($vmhost.HyperthreadingActive)"
 
     $Table.cell(7,1).range.Bold=0
     $Table.cell(7,1).range.text = "CPU Total (ghz)"
@@ -615,12 +615,12 @@ foreach ($vmhost in $vmhosts){
     $Table.cell(8,1).range.Bold=0
     $Table.cell(8,1).range.text = "CPU Count"
     $Table.cell(8,2).range.Bold=0
-    $Table.cell(8,2).range.text= $vmhostInfo.CpuCount
+    $Table.cell(8,2).range.text= "$($vmhostInfo.CpuCount)"
 
     $Table.cell(9,1).range.Bold=0
     $Table.cell(9,1).range.text = "Core Count Total"
     $Table.cell(9,2).range.Bold=0
-    $Table.cell(9,2).range.text= $vmhostInfo.CPUCoreCountTotal
+    $Table.cell(9,2).range.text= "$($vmhostInfo.CPUCoreCountTotal)"
 
     $Table.cell(10,1).range.Bold=0
     $Table.cell(10,1).range.text = "ESXi License Key"
@@ -633,7 +633,7 @@ foreach ($vmhost in $vmhosts){
     #Detailed Network Info
     $Selection.Style = "Heading 4"
     $Selection.TypeText("Network")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
     
     $NetworkInfo = Get-VMHostNetwork $vmhost   
@@ -654,12 +654,12 @@ foreach ($vmhost in $vmhosts){
     $Table.cell(3,1).range.Bold=0
     $Table.cell(3,1).range.text = "DNS Server(s)"
     $Table.cell(3,2).range.Bold=0
-    $Table.cell(3,2).range.text= $NetworkInfo.DnsAddress
+    $Table.cell(3,2).range.text= "$($NetworkInfo.DnsAddress)"
 
     $Table.cell(4,1).range.Bold=0
     $Table.cell(4,1).range.text = "IPv6 Enabled"
     $Table.cell(4,2).range.Bold=0
-    $Table.cell(4,2).range.text= $NetworkInfo.IPv6Enabled
+    $Table.cell(4,2).range.text= "$($NetworkInfo.IPv6Enabled)"
 
     
     $adapterCount = 5
@@ -685,13 +685,13 @@ foreach ($vmhost in $vmhosts){
 
     $Selection.Style = "Heading 4"
     $Selection.TypeText("Virtual Switches")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
     $vDSwitch = Get-vdswitch -vmhost $vmhost
     $Selection.Style = "Heading 5"
     $Selection.TypeText("Distributed Virtual Switches")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
     if ($vDSwitch){
         $Range = @($Selection.Paragraphs)[-1].Range
@@ -710,13 +710,13 @@ foreach ($vmhost in $vmhosts){
     }
     Else{
         $Selection.TypeText("No Distributed Virtual Switches found on $($vmhost.Name)")
-#        $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+#        $selection.ParagraphFormat.Alignment = 0
         $Selection.TypeParagraph()
     }
 
     $Selection.Style = "Heading 5"
     $Selection.TypeText("Standard Virtual Switches")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 #List Standard switches
     $vSSwitch = Get-VirtualSwitch -vmhost $vmhost -Standard
@@ -737,7 +737,7 @@ foreach ($vmhost in $vmhosts){
     }
     Else{
         $Selection.TypeText("No Standard Virtual Switches found on $($vmhost.Name)")
-#        $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+#        $selection.ParagraphFormat.Alignment = 0
         $Selection.TypeParagraph()
     }
 }
@@ -746,7 +746,7 @@ foreach ($vmhost in $vmhosts){
 #list cluster datastores
     $Selection.Style = "Heading 2"
     $Selection.TypeText("Datastores")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
     $datastores = $cluster | Get-Datastore
@@ -781,10 +781,10 @@ foreach ($vmhost in $vmhosts){
         $Table.cell(($row+2),3).range.text = $datastore.FileSystemVersion
         $Table.cell(($row+2),4).range.Bold=0
         $Table.cell(($row+2),4).range.Font.Size = 8
-        $Table.cell(($row+2),4).range.text = $datastore.CapacityGB
+        $Table.cell(($row+2),4).range.text = "$($datastore.CapacityGB)"
         $Table.cell(($row+2),5).range.Bold=0
         $Table.cell(($row+2),5).range.Font.Size = 8
-        $Table.cell(($row+2),5).range.text = $datastore.FreeSpaceGB
+        $Table.cell(($row+2),5).range.text = "$($datastore.FreeSpaceGB)"
         $Table.cell(($row+2),6).range.Bold=0
         $Table.cell(($row+2),6).range.Font.Size = 8
         $Table.cell(($row+2),6).range.text = "{0:P2}" -f ($datastore.FreeSpaceGB/$datastore.CapacityGB)
@@ -796,7 +796,7 @@ foreach ($vmhost in $vmhosts){
 #List VMs
     $Selection.Style = "Heading 2"
     $Selection.TypeText("VM Summary")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
     $vms = get-vm -Location $cluster | sort
@@ -820,7 +820,7 @@ foreach ($vmhost in $vmhosts){
         $vminfo = Get-VMGuest -vm $vm
         $Table.cell(($row+2),1).range.Bold = 0
         $Table.cell(($row+2),1).range.Font.Size = 8
-        $Table.cell(($row+2),1).range.text = $vmInfo.VM
+        $Table.cell(($row+2),1).range.text = $vmInfo.VM.Name
         $Table.cell(($row+2),2).range.Bold = 0
         $Table.cell(($row+2),2).range.Font.Size = 8
         $Table.cell(($row+2),2).range.text = $($vm.PowerState -creplace  '([A-Z\W_]|\d+)(?<![a-z])',' $&')
@@ -843,12 +843,12 @@ foreach ($vmhost in $vmhosts){
 
     $Selection.Style = "Heading 2"
     $Selection.TypeText("Port Groups")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
     $Selection.Style = "Heading 3"
     $Selection.TypeText("Port Groups on Distributed vSwitches")
-    $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    $selection.ParagraphFormat.Alignment = 0
     $Selection.TypeParagraph()
 
     $vdPortGroups = Get-VDPortgroup -VDSwitch (Get-VDSwitch -VMHost (get-vmhost -Location $cluster))
@@ -867,13 +867,13 @@ foreach ($vmhost in $vmhosts){
             $row = 2
             ForEach ($vdPortGroup in $vdPortGroups){
                 $Table.cell($row,1).range.Bold=0
-                $Table.cell($row,1).range.text = $vdPortGroup.VDSwitch
+                $Table.cell($row,1).range.text = $vdPortGroup.VDSwitch.Name
                 $Table.cell($row,2).range.Bold=0
                 $Table.cell($row,2).range.text = $vdPortGroup.Name
                 $Table.cell($row,3).range.Bold=0
                 $Table.cell($row,3).range.text = $vdPortGroup.vlanconfiguration.vlanID
                 $Table.cell($row,4).range.Bold=0
-                $Table.cell($row,4).range.text = $vdPortGroup.vlanconfiguration.vlanType   
+                $Table.cell($row,4).range.text = "$($vdPortGroup.vlanconfiguration.vlanType)"
                 $row++
             }
         $Word.Selection.Start= $Document.Content.End
@@ -881,12 +881,12 @@ foreach ($vmhost in $vmhosts){
         }
         Else{
             $Selection.TypeText("No Distributed Virtual Switches found for cluster $cluster")
-    #        $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    #        $selection.ParagraphFormat.Alignment = 0
             $Selection.TypeParagraph()
         }
         $Selection.Style = "Heading 3"
         $Selection.TypeText("Port Groups on Standard vSwitches")
-        $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+        $selection.ParagraphFormat.Alignment = 0
         $Selection.TypeParagraph()
        $vsPortGroups = Get-VirtualPortGroup -vmhost $vmhosts -Standard
         if ($vsPortGroups){
@@ -906,11 +906,11 @@ foreach ($vmhost in $vmhosts){
                 $Table.cell($row,1).range.Bold=0
                 $Table.cell($row,1).range.text = $(Get-vmhost -id $vsPortGroup.VMHostId).Name
                 $Table.cell($row,2).range.Bold=0
-                $Table.cell($row,2).range.text = $vsPortGroup.VirtualSwitch
+                $Table.cell($row,2).range.text = "$($vsPortGroup.VirtualSwitch)"
                 $Table.cell($row,3).range.Bold=0
                 $Table.cell($row,3).range.text = $vsPortGroup.Name
                 $Table.cell($row,4).range.Bold=0
-                $Table.cell($row,4).range.text = $vsPortGroup.vlanID
+                $Table.cell($row,4).range.text = "$($vsPortGroup.vlanID)"
                 $row++          
             }
         $Word.Selection.Start= $Document.Content.End
@@ -918,7 +918,7 @@ foreach ($vmhost in $vmhosts){
         }
         Else{
             $Selection.TypeText("No Standard Virtual Switches found for cluster $cluster")
-    #        $selection.ParagraphFormat.Alignment = "wdAlignParagraphLeft"
+    #        $selection.ParagraphFormat.Alignment = 0
             $Selection.TypeParagraph()
         }
 
@@ -936,5 +936,5 @@ $null = [System.Runtime.InteropServices.Marshal]::ReleaseComObject([System.__Com
 Remove-Variable word
 
 Write-Log "Finished creating documentation"
-Disconnect-VIServer * -Confirm:$false
+#Disconnect-VIServer * -Confirm:$false
 Exit 0
