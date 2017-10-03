@@ -48,7 +48,7 @@ Function Write-Log{
 		[string]$BGColor="Black"
 		)
 	$LogData = ((Get-Date -Format o) + " " + $LogData)
-#	add-content $Powerclilogfile $LogData
+	add-content $Powerclilogfile $LogData
 	write-host $LogData -foregroundcolor $FGColor -backgroundcolor $BGColor
 }
 Function Select-Folder {
@@ -402,7 +402,7 @@ Function Get-Clusters{
 [void] [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") 
 
 #Variable declaration 
-$PowercliLogPath = $PSScriptRoot + "\VirtualPlatformLogs\"
+$PowercliLogPath = $PSScriptRoot + "\" + $MyInvocation.MyCommand.Name.TrimEnd("ps1") + "\"
 $PowercliLogName = $MyInvocation.MyCommand.Name.TrimEnd("ps1") + "log"
 $TimeStamp = (Get-Date -Format o |ForEach-Object {$_ -replace ":", "."}) + "-"
 $Powerclilogfile = $PowerclilogPath + $TimeStamp + $PowercliLogName
@@ -434,25 +434,8 @@ Catch{
 
 write-Log "Script log information can be found at $Powerclilogfile" -FGC "Yellow"
 
-#check for elevated permissions (Administrator rights), if they don't exist, exit.
-<#If (!([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-	Write-Log "WARNING: You do not have Administrator rights to run this script!" -FGC "Red"
-	Write-Log "Please re-run this script as an Administrator, Script will now exit" -FGC "Red"
-	Exit 99
-}
 
-
-if ($psISE.CurrentFile -like "*ISE*"){
-    Write-Log "This Script can't be run from the ISE... " -FGC Red
-    Write-Log "Terminating Script" -FGC Red
-#    Exit 99
-}
-else {
-    Write-Log "This Script is running from a standard PS Session.... Continuing" 
-}
-#>
-
-If (!(Get-Module -Name VMware.VimAutomation.Core -ErrorAction SilentlyContinue)) {
+If (!(Get-Module VMware.* -ListAvailable -ErrorAction SilentlyContinue)) {
 	Write-Log "Initialize PowerCLI Environment" -FGC "magenta" 
 	.'C:\Program Files (x86)\VMware\Infrastructure\PowerCLI\Scripts\Initialize-PowerCLIEnvironment.ps1'
 }
@@ -967,5 +950,12 @@ $null = [System.Runtime.InteropServices.Marshal]::ReleaseComObject([System.__Com
 Remove-Variable word
 
 Write-Log "Finished creating documentation"
-#Disconnect-VIServer * -Confirm:$false
+
+Switch([System.Windows.Forms.MessageBox]::Show("Disconnect from all vCenter Servers before quitting?", "Disconnect vCenter",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Question,[System.Windows.Forms.MessageBoxDefaultButton]::Button2)){
+    "Yes"{
+        Disconnect-VIServer * -Confirm:$false
+    }
+}
+
+
 Exit 0
