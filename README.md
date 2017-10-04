@@ -18,3 +18,6 @@ Word 2013 or higher
 7. Watch as your documentation is created for you, documents will be saved as vCenterName.docx and vCenterName.pdf if you selected one file per vcenter, and will be named vCenterName-ClusterName.docx and vCenterName-CluserName.pdf if you selected one per cluster. 
 8. Once the document has been created and saved in .docx and .pdf formats, you will be prompted to disconnect from all vcenters or not. If you need to run the script again, chose No.
 9. Review the resulting documentation.
+
+# Resulting Documentation
+See SamplevCenter.doc and SamplevCenter.pdf for examples of the output.
