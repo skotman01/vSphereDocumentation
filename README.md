@@ -21,3 +21,7 @@ Word 2013 or higher
 
 # Resulting Documentation
 See SamplevCenter.doc and SamplevCenter.pdf for examples of the output.
+
+# Confirmed working on
+Full Functionality: Vsphere 6.5 and older
+Partial Functionality: Vsphere 6.7 (Issue with VMs, everything else works as expected)
